@@ -89,7 +89,7 @@ if states is not None:
     # Create a NetworkX graph for visualization
     G = nx.DiGraph()
     for i in range(k):
-        G.add_node(i)
+        G.add_node(i+1)
     for i, conns in enumerate(chart):
         for conn in conns:
             G.add_edge(i, conn)
