@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.animation import FuncAnimation, PillowWriter
+import os
 
 # RandomBooleanNetwork class definition
 class RandomBooleanNetwork:
@@ -86,7 +87,7 @@ if states is not None:
     ani = FuncAnimation(fig, update, frames=n, fargs=(states, scat), interval=200)
 
     # Save animation to display as GIF
-    gif_path = "/mnt/data/rbn_animation.gif"
+    gif_path = "rbn_animation.gif"
     ani.save(gif_path, writer=PillowWriter(fps=5))
     
     st.write("Network Evolution Animation:")
