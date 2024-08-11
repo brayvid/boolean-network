@@ -21,13 +21,15 @@ class RandomBooleanNetwork:
             st.error("Invalid rule size.")
             return None
         states = [self.state.copy()]
+        seen_states = {tuple(self.state)}
         max_iterations = 100  # Limit the maximum number of iterations to avoid infinite loops
         for _ in np.arange(max_iterations):
             self.update()
+            current_state = tuple(self.state)
+            if current_state in seen_states:
+                break  # Stop when a state repeats
+            seen_states.add(current_state)
             states.append(self.state.copy())
-            # Check if steady state is reached (no change in the last two states)
-            if np.array_equal(states[-1], states[-2]):
-                break
         return np.array(states)
 
     def update(self):
@@ -66,7 +68,7 @@ if states is not None:
     st.write("State Pattern")
 
     # Dynamically adjust height based on the number of nodes, with a cap on height
-    height = min(1 + k * 0.2, 6)  # Adjust the height to be proportional but not too tall
+    height = min(1 + k * 0.3, 6)  # Adjust the height to be proportional but not too tall
     
     # Fixed width for consistent layout
     width_in_inches = 8  # Set a fixed width in inches for the figure
