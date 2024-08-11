@@ -1,4 +1,4 @@
-# Boolean Network Animation
+# Random Boolean Network Animation
 
 [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://boolean-network.streamlit.app/)
 
