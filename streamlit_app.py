@@ -46,10 +46,7 @@ class RandomBooleanNetwork:
 st.title("Random Boolean Network")
 
 # Display author information
-st.markdown("""
-**Author**: Blake Rayvid  
-[GitHub Repository](https://github.com/brayvid/boolean-network)
-""")
+st.markdown("""Blake Rayvid - [https://github.com/brayvid/boolean-network](https://github.com/brayvid/boolean-network)""")
 
 # User inputs
 k = st.slider("Number of Nodes", min_value=2, max_value=10, value=6)
