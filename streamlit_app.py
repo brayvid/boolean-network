@@ -2,9 +2,9 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 
-# RandomBooleanNetwork class definition from the provided script
+# RandomBooleanNetwork class definition
 class RandomBooleanNetwork:
     def __init__(self, state, chart, rule):
         self.state = state
@@ -41,9 +41,9 @@ class RandomBooleanNetwork:
 st.title("Random Boolean Network Simulation")
 
 # User inputs
-n = st.sidebar.slider("Number of Iterations (n)", min_value=1, max_value=100, value=50)
-k = st.sidebar.slider("Number of Nodes (k)", min_value=2, max_value=20, value=6)
-s = st.sidebar.number_input("Random Seed (s)", value=0, min_value=0)
+n = st.slider("Number of Iterations (n)", min_value=1, max_value=100, value=50)
+k = st.slider("Number of Nodes (k)", min_value=2, max_value=20, value=6)
+s = st.number_input("Random Seed (s)", value=0, min_value=0)
 
 # Initialize Random Boolean Network
 np.random.seed(s)
@@ -56,7 +56,6 @@ rbn = RandomBooleanNetwork(state, chart, rule)
 states = rbn.go(n)
 
 if states is not None:
-    st.write("Initial State:", state)
     st.write("Generated States Over Time:")
 
     # Display the state pattern as a heatmap
@@ -85,7 +84,10 @@ if states is not None:
     nx.draw_networkx_edges(G, pos, ax=ax)
 
     ani = FuncAnimation(fig, update, frames=n, fargs=(states, scat), interval=200)
-    st.pyplot(fig)
 
+    # Save animation to display as GIF
+    gif_path = "/mnt/data/rbn_animation.gif"
+    ani.save(gif_path, writer=PillowWriter(fps=5))
+    
     st.write("Network Evolution Animation:")
-    st.write(ani.to_jshtml(), unsafe_allow_html=True)
+    st.image(gif_path)
