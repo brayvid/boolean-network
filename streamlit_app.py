@@ -46,8 +46,8 @@ class RandomBooleanNetwork:
 st.title("Random Boolean Network")
 
 # User inputs
-k = st.slider("Number of Nodes (k)", min_value=2, max_value=10, value=6)
-s = st.number_input("Random Seed (s)", value=42, min_value=0)
+k = st.slider("Number of Nodes", min_value=2, max_value=10, value=6)
+s = st.number_input("Random Seed", value=42, min_value=0)
 
 # Initialize Random Boolean Network
 np.random.seed(s)
@@ -91,7 +91,7 @@ if states is not None:
         for conn in conns:
             G.add_edge(i, conn)
 
-    fig, ax = plt.subplots(figsize=(10, height))  # Match the width and height of the heatmap
+    fig, ax = plt.subplots(figsize=(5, 5))  # Keep the animation square (5x5)
     pos = nx.shell_layout(G)  # Use shell layout for the graph
     scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
                                   node_size=500, ax=ax, cmap=cmap)
