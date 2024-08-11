@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.animation import FuncAnimation, PillowWriter
-import os
 
 # RandomBooleanNetwork class definition
 class RandomBooleanNetwork:
@@ -59,11 +58,11 @@ states = rbn.go(n)
 if states is not None:
     st.write("Generated States Over Time:")
 
-    # Display the state pattern as a heatmap
+    # Display the state pattern as a horizontal heatmap
     fig, ax = plt.subplots()
-    ax.imshow(states, cmap='binary', interpolation='nearest')
-    ax.set_xlabel("Node")
-    ax.set_ylabel("Time Step")
+    ax.imshow(states.T, aspect='auto', cmap='binary', interpolation='nearest')
+    ax.set_ylabel("Node")
+    ax.set_xlabel("Time Step")
     st.pyplot(fig)
 
     # Animation function
@@ -81,8 +80,9 @@ if states is not None:
 
     fig, ax = plt.subplots()
     pos = nx.spring_layout(G)
-    scat = nx.draw_networkx_nodes(G, pos, node_color=states[0], cmap='binary', ax=ax)
+    scat = nx.draw_networkx_nodes(G, pos, node_color='orange', node_size=500, ax=ax)
     nx.draw_networkx_edges(G, pos, ax=ax)
+    nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
     ani = FuncAnimation(fig, update, frames=n, fargs=(states, scat), interval=200)
 
