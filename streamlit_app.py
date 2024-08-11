@@ -89,17 +89,20 @@ if states is not None:
     # Create a NetworkX graph for visualization
     G = nx.DiGraph()
     for i in range(k):
-        G.add_node(i+1)
+        G.add_node(i)
     for i, conns in enumerate(chart):
         for conn in conns:
             G.add_edge(i, conn)
+
+    # Adjust node labels to start at 1 instead of 0
+    labels = {i: str(i + 1) for i in range(k)}
 
     fig, ax = plt.subplots(figsize=(width_in_inches, width_in_inches))  # Keep the animation square with same width as state pattern
     pos = nx.shell_layout(G)  # Use shell layout for the graph
     scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
                                   node_size=500, ax=ax)  # Removed cmap parameter
     nx.draw_networkx_edges(G, pos, ax=ax)
-    nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
+    nx.draw_networkx_labels(G, pos, ax=ax, labels=labels, font_color='black')  # Use custom labels
 
     ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=1000)  # 1 frame per second
 
