@@ -45,6 +45,12 @@ class RandomBooleanNetwork:
 # Streamlit App
 st.title("Random Boolean Network")
 
+# Display author information
+st.markdown("""
+**Author**: Blake Rayvid  
+[GitHub Repository](https://github.com/brayvid/boolean-network)
+""")
+
 # User inputs
 k = st.slider("Number of Nodes", min_value=2, max_value=10, value=6)
 s = st.number_input("Random Seed", value=42, min_value=0)
