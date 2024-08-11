@@ -87,7 +87,7 @@ if states is not None:
     nx.draw_networkx_edges(G, pos, ax=ax)
     nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
-    ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=200)
+    ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=1000)
 
     # Save animation to display as GIF
     gif_path = "rbn_animation.gif"
