@@ -76,7 +76,8 @@ if states is not None:
 
     # Animation function
     def update(num, data, scat):
-        scat.set_array(data[num])
+        colors = ['yellow' if state else 'purple' for state in data[num]]
+        scat.set_color(colors)
         return scat,
 
     # Create a NetworkX graph for visualization
@@ -88,7 +89,7 @@ if states is not None:
             G.add_edge(i, conn)
 
     fig, ax = plt.subplots()
-    pos = nx.spring_layout(G)
+    pos = nx.shell_layout(G)  # Use shell layout for the graph
     scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
                                   node_size=500, ax=ax, cmap=cmap)
     nx.draw_networkx_edges(G, pos, ax=ax)
