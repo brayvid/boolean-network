@@ -12,7 +12,7 @@ class RandomBooleanNetwork:
         self.rule = rule
         self.nodes = len(self.state)
 
-    def go(self, n):
+    def go(self):
         if len(self.state) != len(self.chart):
             st.error("Invalid chart size.")
             return None
@@ -20,9 +20,13 @@ class RandomBooleanNetwork:
             st.error("Invalid rule size.")
             return None
         states = [self.state.copy()]
-        for t in np.arange(n):
+        max_iterations = 100  # Limit the maximum number of iterations to avoid infinite loops
+        for _ in np.arange(max_iterations):
             self.update()
             states.append(self.state.copy())
+            # Check if steady state is reached (no change in the last two states)
+            if np.array_equal(states[-1], states[-2]):
+                break
         return np.array(states)
 
     def update(self):
@@ -38,12 +42,11 @@ class RandomBooleanNetwork:
         self.state = nextState
 
 # Streamlit App
-st.title("Random Boolean Network Simulation")
+st.title("Random Boolean Network")
 
 # User inputs
-n = st.slider("Number of Iterations (n)", min_value=1, max_value=100, value=50)
-k = st.slider("Number of Nodes (k)", min_value=2, max_value=20, value=6)
-s = st.number_input("Random Seed (s)", value=0, min_value=0)
+k = st.slider("Number of Nodes", min_value=2, max_value=20, value=6)
+s = st.number_input("Random Seed", value=42, min_value=0)
 
 # Initialize Random Boolean Network
 np.random.seed(s)
@@ -53,13 +56,13 @@ chart = [np.random.choice(np.setdiff1d(range(k), [i], assume_unique=True),
 rule = np.random.randint(2, size=int(np.power(2, k - 1)))
 
 rbn = RandomBooleanNetwork(state, chart, rule)
-states = rbn.go(n)
+states = rbn.go()
 
 if states is not None:
-    st.write("Generated States Over Time:")
+    st.write("State Pattern:")
 
-    # Display the state pattern as a horizontal heatmap
-    fig, ax = plt.subplots()
+    # Display the state pattern as a horizontal heatmap with reduced height
+    fig, ax = plt.subplots(figsize=(10, 2))  # Adjust the figsize to make it shorter
     ax.imshow(states.T, aspect='auto', cmap='binary', interpolation='nearest')
     ax.set_ylabel("Node")
     ax.set_xlabel("Time Step")
@@ -84,11 +87,11 @@ if states is not None:
     nx.draw_networkx_edges(G, pos, ax=ax)
     nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
-    ani = FuncAnimation(fig, update, frames=n, fargs=(states, scat), interval=200)
+    ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=200)
 
     # Save animation to display as GIF
     gif_path = "rbn_animation.gif"
     ani.save(gif_path, writer=PillowWriter(fps=5))
     
-    st.write("Network Evolution Animation:")
+    st.write("Network Animation:")
     st.image(gif_path)
