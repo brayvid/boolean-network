@@ -65,10 +65,9 @@ if states is not None:
     # Dynamically adjust height based on the number of nodes, with a cap on height
     height = min(1 + k * 0.3, 6)  # Adjust the height to be proportional but not too tall
     
-    # Determine width based on the available page width
-    width = st.columns(1)[0]._parent._parent._parent._children[0]._meta.layout.width or 700  # Default to 700px if not available
-    width_in_inches = width / 100  # Convert to inches for figsize
-    
+    # Fixed width for consistent layout
+    width_in_inches = 8  # Set a fixed width in inches for the figure
+
     # Custom colormap for yellow and purple
     cmap = mcolors.ListedColormap(['purple', 'yellow'])
 
