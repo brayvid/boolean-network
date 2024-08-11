@@ -63,7 +63,7 @@ if states is not None:
     st.write("State Pattern")
 
     # Dynamically adjust height based on the number of nodes, with a cap on height
-    height = min(1 + k * 0.3, 6)  # Adjust the height to be proportional but not too tall
+    height = min(1 + k * 0.2, 6)  # Adjust the height to be proportional but not too tall
     
     # Fixed width for consistent layout
     width_in_inches = 8  # Set a fixed width in inches for the figure
