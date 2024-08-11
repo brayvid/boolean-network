@@ -43,11 +43,11 @@ class RandomBooleanNetwork:
         self.state = nextState
 
 # Streamlit App
-st.title("Random Boolean Network Simulation")
+st.title("Random Boolean Network")
 
 # User inputs
-k = st.slider("Number of Nodes (k)", min_value=2, max_value=20, value=6)
-s = st.number_input("Random Seed (s)", value=0, min_value=0)
+k = st.slider("Number of Nodes", min_value=2, max_value=10, value=6)
+s = st.number_input("Random Seed", value=42, min_value=0)
 
 # Initialize Random Boolean Network
 np.random.seed(s)
@@ -60,7 +60,7 @@ rbn = RandomBooleanNetwork(state, chart, rule)
 states = rbn.go()
 
 if states is not None:
-    st.write("Generated States Over Time:")
+    st.write("State Pattern")
 
     # Dynamically adjust height based on the number of nodes, with a cap on height
     height = min(1 + k * 0.3, 6)  # Adjust the height to be proportional but not too tall
@@ -97,7 +97,7 @@ if states is not None:
     fig, ax = plt.subplots(figsize=(width_in_inches, width_in_inches))  # Keep the animation square with same width as state pattern
     pos = nx.shell_layout(G)  # Use shell layout for the graph
     scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
-                                  node_size=500, ax=ax, cmap=cmap)
+                                  node_size=500, ax=ax)  # Removed cmap parameter
     nx.draw_networkx_edges(G, pos, ax=ax)
     nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
@@ -107,5 +107,5 @@ if states is not None:
     gif_path = "rbn_animation.gif"
     ani.save(gif_path, writer=PillowWriter(fps=1))  # Ensure it saves at 1 FPS
     
-    st.write("Network Evolution Animation:")
+    st.write("Network Evolution")
     st.image(gif_path)
