@@ -65,11 +65,16 @@ if states is not None:
     # Dynamically adjust height based on the number of nodes
     height = max(2, k * 0.5)  # Base height on the number of nodes (k)
     
+    # Calculate width based on page width
+    max_page_width = 1000  # Set a max width for larger screens
+    page_width = st._config.get_option("browser.gatherUsageStats")  # Get the default Streamlit page width
+    width = min(page_width, max_page_width) / 100  # Scale width
+
     # Custom colormap for yellow and purple
     cmap = mcolors.ListedColormap(['purple', 'yellow'])
 
     # Display the state pattern as a horizontal heatmap with dynamic height
-    fig, ax = plt.subplots(figsize=(10, height))  # Adjust the height dynamically
+    fig, ax = plt.subplots(figsize=(width, height))  # Adjust the height dynamically
     ax.imshow(states.T, aspect='auto', cmap=cmap, interpolation='nearest')  # Use custom colormap
     ax.set_ylabel("Node")
     ax.set_xlabel("Time Step")
@@ -91,7 +96,7 @@ if states is not None:
         for conn in conns:
             G.add_edge(i, conn)
 
-    fig, ax = plt.subplots(figsize=(5, 5))  # Keep the animation square (5x5)
+    fig, ax = plt.subplots(figsize=(width, width))  # Keep the animation square with same width as state pattern
     pos = nx.shell_layout(G)  # Use shell layout for the graph
     scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
                                   node_size=500, ax=ax, cmap=cmap)
