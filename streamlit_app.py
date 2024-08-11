@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import networkx as nx
 from matplotlib.animation import FuncAnimation, PillowWriter
 
@@ -61,14 +62,16 @@ states = rbn.go()
 if states is not None:
     st.write("State Pattern")
 
-    # Display the state pattern as a horizontal heatmap with reduced height and grid
+    # Custom colormap for yellow and purple
+    cmap = mcolors.ListedColormap(['purple', 'yellow'])
+
+    # Display the state pattern as a horizontal heatmap with reduced height
     fig, ax = plt.subplots(figsize=(10, 2))  # Adjust the figsize to make it shorter
-    ax.imshow(states.T, aspect='auto', cmap='Oranges', interpolation='nearest')  # Use 'Oranges' color map
+    ax.imshow(states.T, aspect='auto', cmap=cmap, interpolation='nearest')  # Use custom colormap
     ax.set_ylabel("Node")
     ax.set_xlabel("Time Step")
-    ax.grid(True, which='both', color='gray', linestyle='--', linewidth=0.5)
-    ax.set_xticks(np.arange(states.shape[0]))
     ax.set_yticks(np.arange(states.shape[1]))
+    ax.set_yticklabels(np.arange(1, states.shape[1] + 1))  # Start labels at 1
     st.pyplot(fig)
 
     # Animation function
@@ -86,7 +89,8 @@ if states is not None:
 
     fig, ax = plt.subplots()
     pos = nx.spring_layout(G)
-    scat = nx.draw_networkx_nodes(G, pos, node_color='orange', node_size=500, ax=ax)
+    scat = nx.draw_networkx_nodes(G, pos, node_color=['yellow' if state else 'purple' for state in states[0]], 
+                                  node_size=500, ax=ax, cmap=cmap)
     nx.draw_networkx_edges(G, pos, ax=ax)
     nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
@@ -96,5 +100,5 @@ if states is not None:
     gif_path = "rbn_animation.gif"
     ani.save(gif_path, writer=PillowWriter(fps=1))  # Ensure it saves at 1 FPS
     
-    st.write("Network Animation")
+    st.write("Network Evolution")
     st.image(gif_path)
