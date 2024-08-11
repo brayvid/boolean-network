@@ -59,13 +59,16 @@ rbn = RandomBooleanNetwork(state, chart, rule)
 states = rbn.go()
 
 if states is not None:
-    st.write("State Pattern:")
+    st.write("State Pattern")
 
-    # Display the state pattern as a horizontal heatmap with reduced height
+    # Display the state pattern as a horizontal heatmap with reduced height and grid
     fig, ax = plt.subplots(figsize=(10, 2))  # Adjust the figsize to make it shorter
-    ax.imshow(states.T, aspect='auto', cmap='binary', interpolation='nearest')
+    ax.imshow(states.T, aspect='auto', cmap='Oranges', interpolation='nearest')  # Use 'Oranges' color map
     ax.set_ylabel("Node")
     ax.set_xlabel("Time Step")
+    ax.grid(True, which='both', color='gray', linestyle='--', linewidth=0.5)
+    ax.set_xticks(np.arange(states.shape[0]))
+    ax.set_yticks(np.arange(states.shape[1]))
     st.pyplot(fig)
 
     # Animation function
@@ -87,11 +90,11 @@ if states is not None:
     nx.draw_networkx_edges(G, pos, ax=ax)
     nx.draw_networkx_labels(G, pos, ax=ax, font_color='black')
 
-    ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=1000)
+    ani = FuncAnimation(fig, update, frames=len(states), fargs=(states, scat), interval=1000)  # 1 frame per second
 
     # Save animation to display as GIF
     gif_path = "rbn_animation.gif"
-    ani.save(gif_path, writer=PillowWriter(fps=5))
+    ani.save(gif_path, writer=PillowWriter(fps=1))  # Ensure it saves at 1 FPS
     
-    st.write("Network Animation:")
+    st.write("Network Animation")
     st.image(gif_path)
