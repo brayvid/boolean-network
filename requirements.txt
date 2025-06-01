@@ -1,5 +1,6 @@
-streamlit
-numpy 
+Flask
+numpy
 matplotlib
 networkx
-pillow
+Pillow
+gunicorn
