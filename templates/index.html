@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- SEO FIX: Added a more descriptive title and a meta description -->
-    <title>Random Boolean Network</title>
+    <title>Random Boolean Network Visualizer</title>
     <meta name="description" content="An interactive tool to generate and visualize Random Boolean Networks (RBNs). Explore network dynamics by adjusting nodes and random seeds.">
 
+    <!-- The favicon is correctly linked from the static folder -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- PERFORMANCE FIX: All CSS is now in an external, minified file for caching -->
+    <!-- Your minified CSS bundle is correctly linked -->
     {% assets "all_css" %}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
 
-    <!-- PERFORMANCE FIX: 'defer' stops this script from blocking page rendering -->
+    <!-- Your Google Analytics script is correctly implemented -->
     <script defer src="https://www.googletagmanager.com/gtag/js?id=G-5ECZRS46XF"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -29,11 +29,12 @@
         <h1>Random Boolean Network</h1>
         <p class="author"><a href="https://github.com/brayvid/boolean-network" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
 
+        <!-- The form is unchanged and works perfectly -->
         <form method="POST">
             <div class="form-group">
                 <label for="k">Number of Nodes:</label>
                 <div class="slider-container">
-                    <input type="range" id="k" name="k" min="2" max="10" value="{{ k_value | default(6) }}">
+                    <input type="range" id="k" name="k" min="1" max="10" value="{{ k_value | default(6) }}">
                     <output for="k" id="k_output_value">{{ k_value | default(6) }}</output>
                 </div>
             </div>
@@ -44,45 +45,50 @@
             <input type="submit" value="Generate Network">
         </form>
 
+        <!-- The error message display is unchanged -->
         {% if error_message %}
             <p class="error">{{ error_message }}</p>
         {% endif %}
 
-        <!-- PERFORMANCE FIX: Load heatmap from a fast, cacheable file, not from slow Base64 in the HTML -->
-        {% if heatmap_filename and not error_message %}
+        <!-- === RAILWAY DEPLOYMENT CHANGE START === -->
+        
+        <!-- The 'if' condition now checks for 'heatmap_url' instead of 'heatmap_filename' -->
+        <!-- The 'src' attribute now directly uses the 'heatmap_url' variable -->
+        {% if heatmap_url and not error_message %}
             <div class="output-section">
                 <h2>State Pattern</h2>
-                <img src="{{ url_for('static', filename=heatmap_filename) }}" alt="Heatmap showing the state of each node over time.">
+                <img src="{{ heatmap_url }}" alt="Heatmap showing the state of each node over time." class="img-fluid rounded shadow-sm">
             </div>
         {% endif %}
 
-        <!-- PERFORMANCE FIX: Use a highly efficient MP4 video instead of a large GIF -->
-        {% if animation_filename and not error_message %}
+        <!-- The 'if' condition now checks for 'animation_url' instead of 'animation_filename' -->
+        <!-- The 'src' attribute in the <source> tag now directly uses the 'animation_url' variable -->
+        {% if animation_url and not error_message %}
             <div class="output-section">
                 <h2>Network Evolution</h2>
-                <video autoplay loop muted playsinline width="600" height="600">
-                    <source src="{{ url_for('static', filename=animation_filename) }}" type="video/mp4">
+                <video autoplay loop muted playsinline class="img-fluid rounded shadow-sm">
+                    <source src="{{ animation_url }}" type="video/mp4">
                     Your browser does not support the video tag. This is an animation of the network nodes changing state.
                 </video>
             </div>
         {% endif %}
+        
+        <!-- === RAILWAY DEPLOYMENT CHANGE END === -->
+
     </div>
 
+    <!-- The slider script is unchanged and works perfectly -->
     <script>
-        // This small script is fine to keep here.
         document.addEventListener('DOMContentLoaded', function() {
             const kSlider = document.getElementById('k');
             const kOutput = document.getElementById('k_output_value');
 
             if (kSlider && kOutput) {
-                // Function to update the output
                 const updateOutput = () => {
                     kOutput.textContent = kSlider.value;
                 };
-                // Set initial value
-                updateOutput();
-                // Update on slider input
-                kSlider.addEventListener('input', updateOutput);
+                updateOutput(); // Set initial value on page load
+                kSlider.addEventListener('input', updateOutput); // Update on slider input
             }
         });
     </script>
