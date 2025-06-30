@@ -1,0 +1,159 @@
+/* Basic Reset and Box Sizing */
+html {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    background-color: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+h1, h2 {
+    color: #1a1a1a;
+    text-align: center;
+}
+h1 {
+    font-size: 2.2em;
+    margin-top: 0;
+    margin-bottom: 0.25em;
+}
+h2 {
+    margin-top: 1.5em;
+    margin-bottom: 0.75em;
+}
+
+.author {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9em;
+}
+.author a {
+    color: #0056b3;
+    text-decoration: none;
+}
+.author a:hover {
+    text-decoration: underline;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 350px;
+}
+label {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+input[type="range"] {
+    flex-grow: 1; /* Slider takes up remaining space */
+}
+output {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #0056b3;
+    min-width: 2ch; /* Reserve space for two characters */
+    text-align: left;
+}
+input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+input[type="submit"] {
+    /* ACCESSIBILITY FIX: High-contrast blue button */
+    background-color: #0056b3;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+}
+input[type="submit"]:hover {
+    background-color: #003d7a;
+}
+
+.output-section {
+    margin-top: 40px;
+}
+.output-section img,
+.output-section video {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 4px;
+}
+
+.error {
+    /* ACCESSIBILITY FIX: High-contrast error message */
+    color: #D8000C;
+    background-color: #FFD2D2;
+    font-weight: bold;
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px solid #D8000C;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* --- Media Queries for Mobile --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin: 0 15px;
+    }
+    h1 { font-size: 1.8em; }
+}
+
+@media (max-width: 480px) {
+    body { padding: 10px 0; }
+    .container {
+        padding: 15px;
+        margin: 0 10px;
+    }
+    h1 { font-size: 1.6em; }
+    .form-group { max-width: 100%; }
+}

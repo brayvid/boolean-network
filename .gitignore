@@ -1,2 +1,44 @@
 .DS_Store
 venv/
+.venv/
+
+# --- Flask-Assets ---
+# Ignore the cache directory
+.webassets-cache/
+
+# Ignore the generated output directory
+static/gen/
+
+
+# === Other Standard Python/Flask ignores (Highly Recommended) ===
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE / Editor specific
+.vscode/
+.idea/
+
+# macOS specific
+.DS_Store
+
+# Instance folder (for secrets, local DBs)
+/instance/
+
+# Environment variables file
+.env
+*.env
+
+# Ignore the directory for generated CSS/JS bundles
+/static/gen/
+
+# Ignore the directory for generated PNG/MP4 media
+/static/generated_media/
+

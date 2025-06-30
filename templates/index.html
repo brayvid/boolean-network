@@ -3,190 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO FIX: Added a more descriptive title and a meta description -->
     <title>Random Boolean Network</title>
+    <meta name="description" content="An interactive tool to generate and visualize Random Boolean Networks (RBNs). Explore network dynamics by adjusting nodes and random seeds.">
+
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        /* Basic Reset and Box Sizing */
-        html {
-            box-sizing: border-box;
-        }
-        *, *:before, *:after {
-            box-sizing: inherit;
-        }
 
-        body {
-            font-family: sans-serif;
-            margin: 0; /* Remove default body margin */
-            padding: 20px 0; /* Add some vertical padding to body, no horizontal */
-            background-color: #f0f0f0;
-            line-height: 1.6; /* Improve readability */
-        }
+    <!-- PERFORMANCE FIX: All CSS is now in an external, minified file for caching -->
+    {% assets "all_css" %}
+      <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
 
-        .container {
-            background-color: white;
-            padding: 20px; /* Internal padding for content within the container */
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-
-            /* --- Desktop Centering & Width Control --- */
-            max-width: 1100px; /* Adjust as needed for desired desktop width */
-            margin-left: auto;  /* Center the container horizontally */
-            margin-right: auto; /* Center the container horizontally */
-        }
-
-        h1, h2 {
-            color: #333;
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-top: 0; /* Remove default top margin if body/container handles spacing */
-            margin-bottom: 0.5em;
-            text-align: center;
-        }
-        h2 {
-            margin-top: 1.5em; /* Add some space above subheadings */
-            margin-bottom: 0.5em;
-            text-align: center; /* Optional: center subheadings */
-        }
-
-        label { display: block; margin-top: 10px; margin-bottom: 5px; } /* Added margin-bottom */
-
-        input[type="number"], input[type="range"] {
-            width: 100%; /* Make inputs take full width of their parent div */
-            max-width: 250px; /* But cap their max width */
-            padding: 8px;
-            /* margin-top: 5px; Removed as label has margin-bottom */
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        /* Specific for range input display */
-        #k + output { /* Style the output element next to the range slider */
-            margin-left: 10px;
-            font-weight: bold;
-        }
-
-
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px; /* Increased padding for better click target */
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-size: 1em; /* Ensure consistent font size */
-        }
-        input[type="submit"]:hover { background-color: #45a049; }
-
-        .output-section {
-            margin-top: 30px; /* More space above output sections */
-        }
-        .output-section img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            display: block; /* To allow margin auto centering if needed for fixed width images */
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #ffebee;
-            border: 1px solid #ef9a9a;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .author {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px; /* Space between form groups */
-            margin-bottom: 20px; /* Space after the form */
-        }
-        form > div {
-            display: flex;
-            flex-direction: column; /* Stack label and input vertically */
-            align-items: center; /* Center items within the div */
-            width: 100%; /* Allow div to take space for centering its content */
-            max-width: 350px; /* Control max width of label/input groups */
-        }
-         form > div label {
-            text-align: center; /* Center label text */
-        }
-
-
-        /* --- Media Query for Mobile --- */
-        @media (max-width: 768px) { /* Tablet and smaller */
-            body {
-                padding: 10px 0; /* Reduce body padding on mobile */
-            }
-            .container {
-                /* On mobile, margin: auto will still work if screen is wider than max-width.
-                   If screen is narrower, it will take up available width.
-                   The key is that max-width is already set.
-                   We primarily adjust internal padding here. */
-                padding: 15px;
-                margin-left: 10px;  /* Add small margin so it doesn't touch edges */
-                margin-right: 10px; /* Add small margin so it doesn't touch edges */
-                max-width: none; /* Allow container to be truly full width on mobile, respecting its margins */
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            input[type="number"], input[type="range"] {
-                /* max-width is already good, width 100% will adapt */
-            }
-            form > div {
-                max-width: 90%; /* Allow form groups to be a bit wider on mobile */
-            }
-        }
-
-        @media (max-width: 480px) { /* Smaller mobile phones */
-            h1 {
-                font-size: 1.6em;
-            }
-            .container {
-                padding: 10px;
-                 margin-left: 5px;
-                margin-right: 5px;
-            }
-        }
-    </style>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5ECZRS46XF"></script>
+    <!-- PERFORMANCE FIX: 'defer' stops this script from blocking page rendering -->
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-5ECZRS46XF"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-5ECZRS46XF');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5ECZRS46XF');
     </script>
 </head>
 <body>
     <div class="container">
         <h1>Random Boolean Network</h1>
-        <p class="author"><a href="https://github.com/brayvid/boolean-network" target="_blank">View on GitHub</a></p>
+        <p class="author"><a href="https://github.com/brayvid/boolean-network" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
 
         <form method="POST">
-            <div>
+            <div class="form-group">
                 <label for="k">Number of Nodes:</label>
-                <div> <!-- Wrapper for slider and output for better alignment if needed -->
-                    <input type="range" id="k" name="k" min="2" max="10" value="{{ k_value | default(6) }}" oninput="document.getElementById('k_output_value').textContent = this.value">
-                    <output id="k_output_value">{{ k_value | default(6) }}</output>
+                <div class="slider-container">
+                    <input type="range" id="k" name="k" min="2" max="10" value="{{ k_value | default(6) }}">
+                    <output for="k" id="k_output_value">{{ k_value | default(6) }}</output>
                 </div>
             </div>
-            <div>
+            <div class="form-group">
                 <label for="s">Random Seed:</label>
                 <input type="number" id="s" name="s" value="{{ s_value | default(42) }}" min="0">
             </div>
@@ -197,33 +48,43 @@
             <p class="error">{{ error_message }}</p>
         {% endif %}
 
-        {% if heatmap_data %}
+        <!-- PERFORMANCE FIX: Load heatmap from a fast, cacheable file, not from slow Base64 in the HTML -->
+        {% if heatmap_filename and not error_message %}
             <div class="output-section">
                 <h2>State Pattern</h2>
-                <img src="data:image/png;base64,{{ heatmap_data }}" alt="State Pattern Heatmap">
+                <img src="{{ url_for('static', filename=heatmap_filename) }}" alt="Heatmap showing the state of each node over time.">
             </div>
         {% endif %}
 
-        {% if gif_filename %}
+        <!-- PERFORMANCE FIX: Use a highly efficient MP4 video instead of a large GIF -->
+        {% if animation_filename and not error_message %}
             <div class="output-section">
                 <h2>Network Evolution</h2>
-                <img src="{{ url_for('static', filename=gif_filename) }}?{{ timestamp }}" alt="Network Evolution Animation">
+                <video autoplay loop muted playsinline width="600" height="600">
+                    <source src="{{ url_for('static', filename=animation_filename) }}" type="video/mp4">
+                    Your browser does not support the video tag. This is an animation of the network nodes changing state.
+                </video>
             </div>
         {% endif %}
     </div>
-    <script>
-        // Ensure script runs after DOM is loaded or place it at the end of body
-        const k_slider_el = document.getElementById('k');
-        const k_output_el = document.getElementById('k_output_value');
 
-        if (k_slider_el && k_output_el) {
-            // Set initial value for output
-            k_output_el.textContent = k_slider_el.value;
-            // Update output on slider input
-            k_slider_el.oninput = function() {
-                k_output_el.textContent = this.value;
+    <script>
+        // This small script is fine to keep here.
+        document.addEventListener('DOMContentLoaded', function() {
+            const kSlider = document.getElementById('k');
+            const kOutput = document.getElementById('k_output_value');
+
+            if (kSlider && kOutput) {
+                // Function to update the output
+                const updateOutput = () => {
+                    kOutput.textContent = kSlider.value;
+                };
+                // Set initial value
+                updateOutput();
+                // Update on slider input
+                kSlider.addEventListener('input', updateOutput);
             }
-        }
+        });
     </script>
 </body>
 </html>
