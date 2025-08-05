@@ -112,6 +112,24 @@ input[type="submit"]:hover {
     background-color: #003d7a;
 }
 
+footer {
+    font-family: Helvetica, Arial, sans-serif;
+    text-align: center;
+    padding: 30px 20px; /* Adjusted padding for better spacing */
+    font-size: 0.8rem;
+    color: #555; /* Using a dark gray for a softer look */
+    transition: color 0.3s ease;
+}
+footer a {
+    color: inherit; /* Makes the link color the same as the footer text */
+    text-decoration: none; /* Removes the default underline */
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover effect */
+}
+footer a:hover {
+    color: #000; /* Darkens the link on hover */
+    text-decoration: underline; /* Adds underline on hover for clear interactivity */
+}
+
 .output-section {
     margin-top: 40px;
 }
