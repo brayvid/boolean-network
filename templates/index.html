@@ -6,16 +6,13 @@
 
     <title>Random Boolean Network | Blake Rayvid</title>
     <meta name="description" content="An interactive tool to generate and visualize Random Boolean Networks (RBNs). Explore network dynamics by adjusting nodes and random seeds.">
-
-    <!-- The favicon is correctly linked from the static folder -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
-    <!-- Your minified CSS bundle is correctly linked -->
     {% assets "all_css" %}
       <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
 
-    <!-- Your Google Analytics script is correctly implemented -->
+    <!-- Google Analytics -->
     <script defer src="https://www.googletagmanager.com/gtag/js?id=G-5ECZRS46XF"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -29,7 +26,6 @@
         <h1>Random Boolean Network</h1>
         <p class="author"><a href="https://github.com/brayvid/boolean-network" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
 
-        <!-- The form is unchanged and works perfectly -->
         <form method="POST">
             <div class="form-group">
                 <label for="k">Number of Nodes:</label>
@@ -45,7 +41,6 @@
             <input type="submit" value="Generate Network">
         </form>
 
-        <!-- The error message display is unchanged -->
         {% if error_message %}
             <p class="error">{{ error_message }}</p>
         {% endif %}
@@ -80,7 +75,6 @@
 
     <footer>&copy; 2025 <a href="https://blakerayvid.com">Blake Rayvid</a>. All rights reserved.</footer>
 
-    <!-- The slider script is unchanged and works perfectly -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const kSlider = document.getElementById('k');
