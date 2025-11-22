@@ -1,12 +1,18 @@
 # nixpacks.toml
+
 [phases.setup]
-# Install Python and FFmpeg at the system level
-nixPkgs = ["python3", "ffmpeg"]
+# The "..." is REAL SYNTAX. Do not remove it.
+# It tells Railway to install Python+Pip automatically, then add ffmpeg.
+nixPkgs = ["...", "ffmpeg"]
 
 [phases.install]
-# Install your Python requirements
-cmds = ["pip install -r requirements.txt"]
+# We use 'python -m pip' which is safer than just 'pip'
+cmds = ["python -m pip install -r requirements.txt"]
 
 [phases.build]
-# Run the build script to generate the files before the app starts
+# Generates the media files before the server starts
 cmds = ["python build.py"]
+
+[start]
+# Start the server
+cmd = "gunicorn app:app"
