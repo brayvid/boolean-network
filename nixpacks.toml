@@ -5,17 +5,17 @@
 nixPkgs = ["python3", "ffmpeg"]
 
 [phases.install]
-# 1. 'ensurepip' installs pip into the current environment
-# 2. Then we install the requirements
+# 1. Create a virtual environment named '.venv' (this folder is writable)
+# 2. Use the pip inside that environment to install your requirements
 cmds = [
-    "python3 -m ensurepip",
-    "python3 -m pip install -r requirements.txt"
+    "python3 -m venv .venv",
+    ".venv/bin/pip install -r requirements.txt"
 ]
 
 [phases.build]
-# Generate the media files
-cmds = ["python3 build.py"]
+# Run the build script using the Virtual Environment's Python
+cmds = [".venv/bin/python build.py"]
 
 [start]
-# Start Gunicorn using the module syntax to ensure path is correct
-cmd = "python3 -m gunicorn app:app"
+# Start the server using the Virtual Environment's Gunicorn
+cmd = ".venv/bin/gunicorn app:app"
