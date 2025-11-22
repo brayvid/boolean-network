@@ -9,21 +9,12 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 from flask import Flask, render_template, request, url_for, send_from_directory
 import time
 
-from flask_caching import Cache
 from flask_compress import Compress
 from flask_assets import Environment, Bundle
 
 app = Flask(__name__, instance_relative_config=True)
 Compress(app)
 os.makedirs(app.instance_path, exist_ok=True)
-
-cache_config = {
-    "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": os.path.join(app.instance_path, "cache"),
-    "CACHE_DEFAULT_TIMEOUT": 3600
-}
-app.config.from_mapping(cache_config)
-cache = Cache(app)
 
 assets = Environment(app)
 css = Bundle('css/main.css', filters='cssmin', output='gen/packed.css')
@@ -38,7 +29,6 @@ def serve_media(filename):
     return send_from_directory(MEDIA_PATH, filename)
 
 class RandomBooleanNetwork:
-    # This class is unchanged and correct.
     def __init__(self, state, chart, rule):
         self.state = state
         self.chart = chart
@@ -94,27 +84,18 @@ class RandomBooleanNetwork:
             nextState[node_idx] = self.rule[rule_index]
         self.state = nextState
 
-#
-# ==============================================================================
-# === THIS IS THE CORRECTED FUNCTION. PLEASE ENSURE YOURS LOOKS LIKE THIS. ===
-# ==============================================================================
-#
-@cache.memoize()
 def generate_rbn_visuals(k_val, s_val):
-    print(f"CACHE MISS: Generating visuals for k={k_val}, s={s_val}")
+    print(f"Requesting visuals for k={k_val}, s={s_val}")
 
     file_identifier = f"k{k_val}_s{s_val}"
     
-    # --- FIX WAS APPLIED HERE ---
-    # 1. Define ONLY the base filenames. No directory paths!
     heatmap_filename = f"heatmap_{file_identifier}.png"
+
     animation_filename = f"rbn_animation_{file_identifier}.mp4"
 
-    # 2. Build the full path for SAVING using the MEDIA_PATH variable.
     heatmap_path = os.path.join(MEDIA_PATH, heatmap_filename)
     animation_path = os.path.join(MEDIA_PATH, animation_filename)
     
-    # 3. The dictionary that gets returned contains ONLY the base filenames.
     output = {
         "heatmap_filename": heatmap_filename,
         "animation_filename": animation_filename,
@@ -176,6 +157,8 @@ def generate_rbn_visuals(k_val, s_val):
         nx.draw_networkx_labels(G, pos, ax=ax_anim, labels=labels, font_color='white', font_size=12)
         
         ani = FuncAnimation(fig_anim, lambda n: scat.set_color(['#FFD700' if s else '#4B0082' for s in states_history[n]]), frames=len(states_history), interval=500)
+        
+        # RESTORED: FFMpegWriter
         ani.save(animation_path, writer=FFMpegWriter(fps=2, bitrate=1800))
         plt.close(fig_anim)
     except Exception as e:
