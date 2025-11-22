@@ -1,4 +1,7 @@
 import os
+import io
+import base64
+import tempfile
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -7,14 +10,12 @@ import matplotlib.colors as mcolors
 import networkx as nx
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 from flask import Flask, render_template, request, url_for, send_from_directory
-import time
 
 from flask_compress import Compress
 from flask_assets import Environment, Bundle
 
 app = Flask(__name__, instance_relative_config=True)
 Compress(app)
-os.makedirs(app.instance_path, exist_ok=True)
 
 assets = Environment(app)
 css = Bundle('css/main.css', filters='cssmin', output='gen/packed.css')
@@ -87,25 +88,36 @@ class RandomBooleanNetwork:
 def generate_rbn_visuals(k_val, s_val):
     print(f"Requesting visuals for k={k_val}, s={s_val}")
 
-    file_identifier = f"k{k_val}_s{s_val}"
-    
-    heatmap_filename = f"heatmap_{file_identifier}.png"
-
-    animation_filename = f"rbn_animation_{file_identifier}.mp4"
-
-    heatmap_path = os.path.join(MEDIA_PATH, heatmap_filename)
-    animation_path = os.path.join(MEDIA_PATH, animation_filename)
-    
     output = {
-        "heatmap_filename": heatmap_filename,
-        "animation_filename": animation_filename,
+        "heatmap_data": None,   # Will hold filename OR base64 string
+        "animation_data": None, # Will hold filename OR base64 string
+        "is_static": False,     # Tells template how to render
         "error_message": None
     }
-    
-    if os.path.exists(heatmap_path) and os.path.exists(animation_path):
-        print(f"Found existing files on volume for k={k_val}, s={s_val}. Skipping generation.")
-        return output
 
+    # === OPTIMIZATION: DEFAULT CASE ===
+    # If it's the default, we save to disk and reuse it forever.
+    if k_val == 6 and s_val == 42:
+        file_identifier = f"k{k_val}_s{s_val}"
+        heatmap_filename = f"heatmap_{file_identifier}.png"
+        animation_filename = f"rbn_animation_{file_identifier}.mp4"
+        heatmap_path = os.path.join(MEDIA_PATH, heatmap_filename)
+        animation_path = os.path.join(MEDIA_PATH, animation_filename)
+
+        # If files exist, return them immediately
+        if os.path.exists(heatmap_path) and os.path.exists(animation_path):
+            print("Default case found on disk. Serving from file system.")
+            output["is_static"] = True
+            output["heatmap_data"] = heatmap_filename
+            output["animation_data"] = animation_filename
+            return output
+        
+        # If not, we continue below to generate them, but set a flag to save them at the end.
+        save_to_disk = True
+    else:
+        save_to_disk = False
+
+    # === GENERATION LOGIC ===
     np.random.seed(s_val)
     state = np.random.randint(2, size=k_val)
     chart = []
@@ -129,6 +141,7 @@ def generate_rbn_visuals(k_val, s_val):
         output["error_message"] = rbn.error_message or "Network simulation failed."
         return output
 
+    # 1. Generate Heatmap
     try:
         height = min(1 + k_val * 0.3, 6)
         cmap = mcolors.ListedColormap(['#4B0082', '#FFD700'])
@@ -136,12 +149,24 @@ def generate_rbn_visuals(k_val, s_val):
         ax_heatmap.imshow(states_history.T, aspect='auto', cmap=cmap, interpolation='nearest')
         ax_heatmap.set_ylabel("Node"); ax_heatmap.set_xlabel("Time Step")
         ax_heatmap.set_yticks(np.arange(k_val)); ax_heatmap.set_yticklabels(np.arange(1, k_val + 1))
-        fig_heatmap.savefig(heatmap_path, format="png", bbox_inches='tight')
+        
+        if save_to_disk:
+            fig_heatmap.savefig(heatmap_path, format="png", bbox_inches='tight')
+            output["heatmap_data"] = heatmap_filename
+        else:
+            # Save to memory buffer
+            buf = io.BytesIO()
+            fig_heatmap.savefig(buf, format="png", bbox_inches='tight')
+            buf.seek(0)
+            output["heatmap_data"] = base64.b64encode(buf.getvalue()).decode('utf-8')
+            buf.close()
+        
         plt.close(fig_heatmap)
     except Exception as e:
         output["error_message"] = f"Error generating heatmap: {e}"
         return output
 
+    # 2. Generate Animation
     try:
         G = nx.DiGraph()
         for i in range(k_val): G.add_node(i)
@@ -150,22 +175,38 @@ def generate_rbn_visuals(k_val, s_val):
         
         fig_anim, ax_anim = plt.subplots(figsize=(8, 8))
         pos = nx.circular_layout(G)
-        labels = {i: str(i + 1) for i in range(k_val)}
         node_colors = ['#FFD700' if s else '#4B0082' for s in states_history[0]]
         scat = nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=500, ax=ax_anim)
         nx.draw_networkx_edges(G, pos, ax=ax_anim, arrowstyle='->', arrowsize=20, node_size=500)
-        nx.draw_networkx_labels(G, pos, ax=ax_anim, labels=labels, font_color='white', font_size=12)
+        nx.draw_networkx_labels(G, pos, ax=ax_anim, labels={i: str(i + 1) for i in range(k_val)}, font_color='white', font_size=12)
         
         ani = FuncAnimation(fig_anim, lambda n: scat.set_color(['#FFD700' if s else '#4B0082' for s in states_history[n]]), frames=len(states_history), interval=500)
         
-        # RESTORED: FFMpegWriter
-        ani.save(animation_path, writer=FFMpegWriter(fps=2, bitrate=1800))
+        if save_to_disk:
+            ani.save(animation_path, writer=FFMpegWriter(fps=2, bitrate=1800))
+            output["animation_data"] = animation_filename
+            output["is_static"] = True
+        else:
+            # FFMpeg needs a real file path to write to initially, we can't stream directly to pipe with Matplotlib easily.
+            # We create a temp file, read it, and delete it immediately.
+            with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as tmp_file:
+                ani.save(tmp_file.name, writer=FFMpegWriter(fps=2, bitrate=1800))
+                tmp_file_path = tmp_file.name
+            
+            # Read the temp file into memory
+            with open(tmp_file_path, 'rb') as f:
+                video_bytes = f.read()
+                output["animation_data"] = base64.b64encode(video_bytes).decode('utf-8')
+            
+            # Delete the temp file immediately
+            os.remove(tmp_file_path)
+            output["is_static"] = False
+
         plt.close(fig_anim)
     except Exception as e:
         output["error_message"] = f'{output.get("error_message", "")} Error generating animation: {e}'
 
     return output
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -184,16 +225,16 @@ def index():
         if rbn_results.get("error_message"):
             view_params["error_message"] = rbn_results["error_message"]
         else:
-            view_params["heatmap_url"] = url_for('serve_media', filename=rbn_results['heatmap_filename'])
-            view_params["animation_url"] = url_for('serve_media', filename=rbn_results['animation_filename'])
+            # Pass results directly to template
+            view_params["is_static"] = rbn_results["is_static"]
+            view_params["heatmap_data"] = rbn_results["heatmap_data"]
+            view_params["animation_data"] = rbn_results["animation_data"]
 
     return render_template('index.html', **view_params)
-
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(STATIC_FOLDER, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

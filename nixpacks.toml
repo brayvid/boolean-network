@@ -1,3 +1,12 @@
 # nixpacks.toml
 [phases.setup]
-nixPkgs = ["...", "ffmpeg"]
+# Install Python and FFmpeg at the system level
+nixPkgs = ["python3", "ffmpeg"]
+
+[phases.install]
+# Install your Python requirements
+cmds = ["pip install -r requirements.txt"]
+
+[phases.build]
+# Run the build script to generate the files before the app starts
+cmds = ["python build.py"]

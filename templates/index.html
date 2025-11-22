@@ -45,30 +45,38 @@
             <p class="error">{{ error_message }}</p>
         {% endif %}
 
-        <!-- === RAILWAY DEPLOYMENT CHANGE START === -->
+        <!-- === VISUAL OUTPUT SECTION === -->
         
-        <!-- The 'if' condition now checks for 'heatmap_url' instead of 'heatmap_filename' -->
-        <!-- The 'src' attribute now directly uses the 'heatmap_url' variable -->
-        {% if heatmap_url and not error_message %}
+        {% if heatmap_data and not error_message %}
             <div class="output-section">
                 <h2>State Pattern</h2>
-                <img src="{{ heatmap_url }}" alt="Heatmap showing the state of each node over time." class="img-fluid rounded shadow-sm">
+                {% if is_static %}
+                    <!-- Load from Disk (Fast/Cached for Default k=6, s=42) -->
+                    <img src="{{ url_for('serve_media', filename=heatmap_data) }}" alt="Heatmap showing the state of each node over time." class="img-fluid rounded shadow-sm">
+                {% else %}
+                    <!-- Load from Memory (Base64 for custom values) -->
+                    <img src="data:image/png;base64,{{ heatmap_data }}" alt="Heatmap showing the state of each node over time." class="img-fluid rounded shadow-sm">
+                {% endif %}
             </div>
         {% endif %}
 
-        <!-- The 'if' condition now checks for 'animation_url' instead of 'animation_filename' -->
-        <!-- The 'src' attribute in the <source> tag now directly uses the 'animation_url' variable -->
-        {% if animation_url and not error_message %}
+        {% if animation_data and not error_message %}
             <div class="output-section">
                 <h2>Network Evolution</h2>
                 <video autoplay loop muted playsinline class="img-fluid rounded shadow-sm">
-                    <source src="{{ animation_url }}" type="video/mp4">
+                    {% if is_static %}
+                        <!-- Load from Disk -->
+                        <source src="{{ url_for('serve_media', filename=animation_data) }}" type="video/mp4">
+                    {% else %}
+                        <!-- Load from Memory -->
+                        <source src="data:video/mp4;base64,{{ animation_data }}" type="video/mp4">
+                    {% endif %}
                     Your browser does not support the video tag. This is an animation of the network nodes changing state.
                 </video>
             </div>
         {% endif %}
         
-        <!-- === RAILWAY DEPLOYMENT CHANGE END === -->
+        <!-- === END OUTPUT SECTION === -->
 
     </div>
 
