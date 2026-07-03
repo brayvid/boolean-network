@@ -4,3 +4,7 @@ This web app animates the dynamics of a boolean network, a collection of interco
 
 <img width=100% src=images/states.png>
 <img width=100% src=images/anim.gif>
+
+----
+
+<p align="center">&copy; Copyright 2026 <a href="https://blakerayvid.com">Blake Rayvid</a>. All rights reserved.</p>
